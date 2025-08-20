@@ -1,4 +1,4 @@
-export interface ClientDto {
+export interface CreateClientDto {
     name: string
     age: number
     email: string

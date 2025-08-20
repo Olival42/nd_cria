@@ -1,16 +1,13 @@
-import { ClientDto } from "./clientDto";
-import { PrismaClient } from "./generated/prisma";
+import { createClient, getClients, get } from "./service";
+import { CreateClientDto } from "./clientDto";
 import express, { Request, Response, Router } from "express";
 
-const prisma = new PrismaClient();
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
-  const createClient: ClientDto = req.body;
+  const clientDto: CreateClientDto = req.body;
   try {
-    const client = await prisma.client.create({
-      data: createClient,
-    });
+    const client = await createClient(clientDto);
     res.status(201).json(client);
   } catch (error) {
     console.error(error);
@@ -18,13 +15,30 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/get", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
-    const clients = await prisma.client.findMany();
+    const clients = await getClients();
     res.status(200).json(clients);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erro ao encontrar os clientes" });
+    res.status(500).json({ message: "Erro ao buscar os clientes" });
+  }
+});
+
+router.get("/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    const client = await get(id);
+
+    if (!client) {
+      return res.status(404).json({ message: "Cliente não foi encontrado." });
+    }
+
+    res.status(200).json(client);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao buscar o cliente" });
   }
 });
 

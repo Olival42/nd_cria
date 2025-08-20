@@ -9,5 +9,5 @@ app.use(express.json());
 app.use("/clients", clientRouter);
 
 app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+  console.log(`Servidor rodando.`);
 });
