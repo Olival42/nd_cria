@@ -14,10 +14,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Categoria {
+    ELETRONICO
+    VESTUARIO
+    MOVEIS
+    LIVROS
+    ALIMENTOS
+    BELEZA
+}
+
 model Client {
   id    Int    @id @default(autoincrement())
   name  String
   age Int
   email String @unique
   phone String
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  name String
+  description String?
+  price Float
+  quantity Int
+  categoria Categoria
 }
