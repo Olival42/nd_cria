@@ -19,4 +19,17 @@ async function get(id: number) {
     });
 }
 
-export { createClient, getClients, get };
+async function update(id: number, clientDto: Partial<CreateClientDto>) {
+    return await prisma.client.update({
+        where: { id },
+        data: clientDto
+    });
+}
+
+async function deleteById(id: number) {
+    return await prisma.client.delete({
+        where: { id },
+    });
+}
+
+export { createClient, getClients, get, update, deleteById };

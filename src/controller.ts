@@ -1,4 +1,4 @@
-import { createClient, getClients, get } from "./service";
+import { createClient, getClients, get, update, deleteById } from "./service";
 import { CreateClientDto } from "./clientDto";
 import express, { Request, Response, Router } from "express";
 
@@ -38,7 +38,34 @@ router.get("/:id", async (req: Request, res: Response) => {
     res.status(200).json(client);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erro ao buscar o cliente" });
+    res.status(500).json({ message: "Erro ao buscar o cliente." });
+  }
+});
+
+router.put("/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  const data: CreateClientDto = req.body;
+
+  try {
+    const client = await update(id, data);
+
+    res.status(200).json(client);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao atualizar o cliente." });
+  }
+});
+
+router.delete("/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    await deleteById(id);
+
+    res.status(200).json({ message: "Cliente deletado com sucesso." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao deletar o cliente" });
   }
 });
 
