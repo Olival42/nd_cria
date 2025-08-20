@@ -50,8 +50,13 @@ router.put("/:id", async (req: Request, res: Response) => {
     const client = await update(id, data);
 
     res.status(200).json(client);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
+
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Cliente não encontrado." });
+    }
+
     res.status(500).json({ message: "Erro ao atualizar o cliente." });
   }
 });
@@ -63,8 +68,13 @@ router.delete("/:id", async (req: Request, res: Response) => {
     await deleteById(id);
 
     res.status(200).json({ message: "Cliente deletado com sucesso." });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
+
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Cliente não encontrado." });
+    }
+
     res.status(500).json({ message: "Erro ao deletar o cliente" });
   }
 });
