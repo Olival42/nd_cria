@@ -5,7 +5,7 @@ CREATE TYPE "public"."Categoria" AS ENUM ('ELETRONICO', 'VESTUARIO', 'MOVEIS', '
 CREATE TABLE "public"."Client" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "age" INTEGER NOT NULL,
+    "cpf" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
 
@@ -23,6 +23,9 @@ CREATE TABLE "public"."Product" (
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Client_cpf_key" ON "public"."Client"("cpf");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Client_email_key" ON "public"."Client"("email");

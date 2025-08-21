@@ -26,7 +26,7 @@ enum Categoria {
 model Client {
   id    Int    @id @default(autoincrement())
   name  String
-  age Int
+  cpf String @unique
   email String @unique
   phone String
 }

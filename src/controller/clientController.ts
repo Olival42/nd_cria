@@ -1,11 +1,23 @@
 import { createClient, getClients, get, update, deleteById } from "../service/clientService";
-import { CreateClientDto } from "../dto/clientDto";
+import { CreateClientDto } from "../dto/ClientDto/CreateClientDto";
 import express, { Request, Response, Router } from "express";
+import { validate } from "class-validator";
+import { UpdateClientDto } from "../dto/ClientDto/UpdateClientDto";
 
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
-  const clientDto: CreateClientDto = req.body;
+  const clientDto = Object.assign(new CreateClientDto(), req.body);
+  const erros = await validate(clientDto);
+
+  if (erros.length > 0) {
+    const errosFromatados = erros.map(e => ({
+      campo: e.property,
+      mensagens: Object.values(e.constraints || {})
+    }));
+    return res.status(400).json(errosFromatados);
+  }
+
   try {
     const client = await createClient(clientDto);
     res.status(201).json(client);
@@ -44,11 +56,22 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.put("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
-  const data: CreateClientDto = req.body;
+  const clientDto = Object.assign(new UpdateClientDto(), req.body);
+  const erros = await validate(clientDto, { skipMissingProperties: true });
+  // skipMissingProperties: true -> ignora campos que não foram enviados
+
+  if (erros.length > 0) {
+    const errosFromatados = erros.filter(e => (
+      Object.keys(req.body).includes(e.property)
+    )).map(e => ({
+      campo: e.property,
+      mensagens: Object.values(e.constraints || {})
+    }));
+    return res.status(400).json(errosFromatados);
+  }
 
   try {
-    const client = await update(id, data);
-
+    const client = await update(id, clientDto);
     res.status(200).json(client);
   } catch (error: any) {
     console.error(error);
@@ -66,7 +89,6 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
   try {
     await deleteById(id);
-
     res.status(200).json({ message: "Cliente excluido com sucesso." });
   } catch (error: any) {
     console.error(error);

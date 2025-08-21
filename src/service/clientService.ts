@@ -1,4 +1,5 @@
-import { CreateClientDto } from "../dto/clientDto";
+import { CreateClientDto } from "../dto/ClientDto/CreateClientDto";
+import { UpdateClientDto } from "../dto/ClientDto/UpdateClientDto";
 import { PrismaClient } from "../generated/prisma";
 
 const prisma = new PrismaClient();
@@ -19,7 +20,7 @@ async function get(id: number) {
     });
 }
 
-async function update(id: number, clientDto: Partial<CreateClientDto>) {
+async function update(id: number, clientDto: Partial<UpdateClientDto>) {
     return await prisma.client.update({
         where: { id },
         data: clientDto

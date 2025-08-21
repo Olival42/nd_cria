@@ -1,11 +1,22 @@
 import { createProduct, getProducts, get, deleteById, update } from "../service/productService";
-import { CreateProductDto } from "../dto/productDto";
+import { CreateProductDto } from "../dto/ProductDto/CreateProductDto";
 import express, { Request, Response, Router } from "express";
+import { validate } from "class-validator";
+import { UpdateProductDto } from "../dto/ProductDto/UpdateProductDto";
 
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
-    const productDto: CreateProductDto = req.body;
+    const productDto = Object.assign(new CreateProductDto(), req.body);
+    const erros = await validate(productDto);
+
+    if (erros.length > 0) {
+        const errosFormatados = erros.map(e => ({
+            campo: e.property,
+            messagem: Object.values(e.constraints || {})
+        }));
+        return res.status(400).json(errosFormatados);
+    }
 
     try {
         const product = await createProduct(productDto);
@@ -62,7 +73,18 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
 router.put("/:id", async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const productDto: CreateProductDto = req.body;
+    const productDto = Object.assign(new UpdateProductDto(), req.body);
+    const erros = await validate(productDto, { skipMissingProperties: true });
+
+    if (erros.length > 0) {
+        const errosFormatados = erros.filter(e => (
+            Object.keys(req.body).includes(e.property)
+        )).map(e => ({
+                campo: e.property,
+                messagem: Object.values(e.constraints || {})
+            }));
+        return res.status(400).json(errosFormatados);
+    }
 
     try {
         const product = await update(id, productDto);

@@ -1,10 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const clientService_1 = require("../service/clientService");
+const CreateClientDto_1 = require("../dto/ClientDto/CreateClientDto");
 const express_1 = require("express");
+const class_validator_1 = require("class-validator");
+const UpdateClientDto_1 = require("../dto/ClientDto/UpdateClientDto");
 const router = (0, express_1.Router)();
 router.post("/", async (req, res) => {
-    const clientDto = req.body;
+    const clientDto = Object.assign(new CreateClientDto_1.CreateClientDto(), req.body);
+    const erros = await (0, class_validator_1.validate)(clientDto);
+    if (erros.length > 0) {
+        const errosFromatados = erros.map(e => ({
+            campo: e.property,
+            mensagens: Object.values(e.constraints || {})
+        }));
+        return res.status(400).json(errosFromatados);
+    }
     try {
         const client = await (0, clientService_1.createClient)(clientDto);
         res.status(201).json(client);
@@ -40,9 +51,18 @@ router.get("/:id", async (req, res) => {
 });
 router.put("/:id", async (req, res) => {
     const id = parseInt(req.params.id);
-    const data = req.body;
+    const clientDto = Object.assign(new UpdateClientDto_1.UpdateClientDto(), req.body);
+    const erros = await (0, class_validator_1.validate)(clientDto, { skipMissingProperties: true });
+    // skipMissingProperties: true -> ignora campos que não foram enviados
+    if (erros.length > 0) {
+        const errosFromatados = erros.filter(e => (Object.keys(req.body).includes(e.property))).map(e => ({
+            campo: e.property,
+            mensagens: Object.values(e.constraints || {})
+        }));
+        return res.status(400).json(errosFromatados);
+    }
     try {
-        const client = await (0, clientService_1.update)(id, data);
+        const client = await (0, clientService_1.update)(id, clientDto);
         res.status(200).json(client);
     }
     catch (error) {

@@ -1,5 +1,6 @@
 import { PrismaClient } from "../generated/prisma";
-import { CreateProductDto } from "../dto/productDto";
+import { CreateProductDto } from "../dto/ProductDto/CreateProductDto";
+import { UpdateProductDto } from "../dto/ProductDto/UpdateProductDto";
 
 const prisma = new PrismaClient();
 
@@ -25,7 +26,7 @@ async function deleteById(id: number) {
     });
 }
 
-async function update(id: number, productDto: Partial<CreateProductDto>) {
+async function update(id: number, productDto: Partial<UpdateProductDto>) {
     return await prisma.product.update({
         where: { id },
         data: productDto,
