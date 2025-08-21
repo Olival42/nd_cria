@@ -4,14 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const { swaggerUi, swaggerDocs } = require("./swagger");
 const clientController_1 = __importDefault(require("./controller/clientController"));
 const productController_1 = __importDefault(require("./controller/productController"));
 require("dotenv/config");
 const app = (0, express_1.default)();
 const port = 3000;
 app.use(express_1.default.json());
+// Middleware do Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/clients", clientController_1.default);
 app.use("/products", productController_1.default);
 app.listen(port, () => {
-    console.log(`Servidor rodando.`);
+    console.log("Servidor rodando em http://localhost:3000");
+    console.log("Swagger rodando em http://localhost:3000/api-docs");
 });
