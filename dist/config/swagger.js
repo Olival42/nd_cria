@@ -1,6 +1,10 @@
 "use strict";
-const swaggerJsDoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 // Configurações do Swagger
 const swaggerOptions = {
     definition: {
@@ -16,8 +20,8 @@ const swaggerOptions = {
             },
         ],
     },
-    apis: ["./src/controller/*.js"], // Caminho para os arquivos com suas rotas e comentários
+    apis: ["./src/controller/*.ts"], // Caminho para os arquivos com suas rotas e comentários
 };
 // Gerar especificação
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-module.exports = { swaggerUi, swaggerDocs };
+const swaggerDocs = (0, swagger_jsdoc_1.default)(swaggerOptions);
+module.exports = { swaggerUi: swagger_ui_express_1.default, swaggerDocs };
