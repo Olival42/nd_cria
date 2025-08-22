@@ -1,25 +1,16 @@
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
 
-// Configurações do Swagger
-const swaggerOptions = {
+export const swaggerSpec = swaggerJSDoc({
     definition: {
-        openapi: "3.0.0", // versão do OpenAPI
+        openapi: "3.0.0",
         info: {
-            title: "API Exemplo com Swagger",
+            title: "API de Produtos",
             version: "1.0.0",
-            description: "Documentação da API com Swagger",
+            description: "Documentação da API de produtos",
         },
         servers: [
-            {
-                url: "http://localhost:3000", // URL base da sua API
-            },
+            { url: "http://localhost:3000" }
         ],
     },
-    apis: ["./src/controller/*.ts"], // Caminho para os arquivos com suas rotas e comentários
-};
-
-// Gerar especificação
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-
-module.exports = { swaggerUi, swaggerDocs };
+    apis: ["./src/routes/*.ts"], // aqui você aponta para onde estão suas rotas
+});

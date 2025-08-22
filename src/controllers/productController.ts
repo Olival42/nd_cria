@@ -46,7 +46,7 @@ export async function deleteById(req: Request, res: Response, next: NextFunction
             throw new NotFoundError("Produto não encontrado.");
         }
 
-        res.status(200).json("Produto excluido com sucesso.");
+        res.status(200).json("Produto excluído com sucesso.");
     } catch (error) {
         next(error);
     }

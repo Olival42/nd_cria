@@ -64,7 +64,7 @@ export async function update(req: Request, res: Response, next: NextFunction) {
       throw new NotFoundError("Cliente não encontrado.");
     }
 
-    return res.status(200).json({ message: "Cliente excluido com sucesso." });
+    return res.status(200).json({ message: "Cliente excluído com sucesso." });
   } catch (error) {
     next(error);
   }
