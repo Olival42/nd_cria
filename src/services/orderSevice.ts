@@ -9,7 +9,9 @@ export interface OrderProductInput {
 const prisma = new PrismaClient();
 
 async function createOrder(clientId: number, products: OrderProductInput[]) {
-    const { orderProducts, total } = await createOrderProducts(products);
+
+    const { orderProducts } = await createOrderProducts(products);
+    const total = calculateTotal(orderProducts);
 
     const result = await prisma.$transaction(async (prisma) => {
         const order = await prisma.order.create({
@@ -20,7 +22,11 @@ async function createOrder(clientId: number, products: OrderProductInput[]) {
                     create: orderProducts,
                 },
             },
-            include: { pedidos: true },
+            include: {
+                pedidos: {
+                    include: { product: true }
+                }
+            }
         });
 
         for (const p of orderProducts) {
@@ -38,11 +44,101 @@ async function createOrder(clientId: number, products: OrderProductInput[]) {
     return result;
 }
 
+async function getOrders(clientId: number) {
+
+    return clientId ? await prisma.order.findMany({
+        where: { clientId },
+        include: {
+            pedidos: {
+                include: { product: true }
+            }
+        },
+    }) : await prisma.order.findMany({
+        include: {
+            pedidos: {
+                include: { product: true }
+            }
+        },
+    });
+}
+
+async function getOrderById(id: number) {
+    return await prisma.order.findUnique({
+        where: { id },
+        include: {
+            pedidos: {
+                include: { product: true }
+            }
+        },
+    }).catch(() => null);
+}
+
+async function deleteById(id: number) {
+
+    try {
+        await prisma.orderProduct.deleteMany({
+            where: { orderId: id },
+        });
+
+        return await prisma.order.delete({
+            where: { id },
+        });
+    } catch (error: any) {
+        if (error.code === "P2025") {
+            return null;
+        }
+        throw error;
+    }
+}
+
+async function updateById(id: number, products: OrderProductInput[]) {
+
+    const { orderProducts } = await createOrderProducts(products);
+    const productIds = products.map(p => p.productId);
+
+    try {
+        return prisma.$transaction(async (prisma) => {
+            await prisma.orderProduct.deleteMany({
+                where: {
+                    orderId: id,
+                    productId: {
+                        in: productIds
+                    },
+                },
+            });
+
+            const orderUpdated = await prisma.order.update({
+                where: { id },
+                data: {
+                    pedidos: { create: orderProducts }
+                },
+                include: { pedidos: true },
+            });
+
+            return await prisma.order.update({
+                where: { id },
+                data: {
+                    total: calculateTotal(orderUpdated.pedidos)
+                },
+                include: {
+                    pedidos: {
+                        include: { product: true }
+                    },
+                },
+            });
+        });
+    }
+    catch (error: any) {
+        if (error.code === "P2025") {
+            return null;
+        }
+        throw error;
+    }
+}
+
 async function createOrderProducts(products: OrderProductInput[]) {
 
-    const productIds = products
-        .map(p => p.productId)
-        .filter(id => id != null);
+    const productIds = products.map(p => p.productId)
 
     const dbProducts = await prisma.product.findMany({
         where: {
@@ -63,9 +159,11 @@ async function createOrderProducts(products: OrderProductInput[]) {
         };
     });
 
-    const total = orderProducts.reduce((acc, item) => acc + item.subTotal, 0);
-
-    return { orderProducts, total };
+    return { orderProducts };
 }
 
-export { createOrder };
+function calculateTotal(orderProducts: any) {
+    return orderProducts.reduce((acc: number, item: { subTotal: number }) => acc + item.subTotal, 0);
+}
+
+export { createOrder, getOrders, getOrderById, deleteById, updateById };

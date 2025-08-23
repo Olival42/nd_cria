@@ -8,13 +8,6 @@
     "esModuleInterop": true,
     "typeRoots": ["src/@types", "./node_modules/@types"],
 
-    // Necessário para @decorators funcionarem
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-
-    // Evita erro com propriedades obrigatórias no DTO
-    "strictPropertyInitialization": false,
-
     "skipLibCheck": true
   },
   "include": ["src"]
