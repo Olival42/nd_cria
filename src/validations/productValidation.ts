@@ -6,7 +6,9 @@ export const createProductSchema = Joi.object({
         .messages({
             "string.empty": "O nome é obrigátorio."
         }),
+
     description: Joi.string().allow(null, ''),
+
     price: Joi.number()
         .min(1)
         .precision(2)
@@ -17,6 +19,7 @@ export const createProductSchema = Joi.object({
             "number.precision": "O preço pode ter no máximo 2 casas decimais.",
             "any.required": "O preço é obrigatório."
         }),
+
     quantity: Joi.number()
         .integer()
         .min(1)
@@ -26,6 +29,7 @@ export const createProductSchema = Joi.object({
             "number.min": "A quantidade mínima é 1.",
             "any.required": "A quantidade é obrigatória."
         }),
+
     categoria: Joi.string()
         .valid("ELETRONICO", "VESTUARIO", "MOVEIS", "LIVROS", "ALIMENTOS", "BELEZA")
         .required()
@@ -41,7 +45,9 @@ export const updateProductSchema = Joi.object({
         .messages({
             "string.alphanum": "O nome deve conter apenas letras e números."
         }),
+
     description: Joi.string(),
+
     price: Joi.number()
         .min(1)
         .precision(2)
@@ -50,6 +56,7 @@ export const updateProductSchema = Joi.object({
             "number.min": "O preço mínimo é 1.",
             "number.precision": "O preço pode ter no máximo 2 casas decimais."
         }),
+
     quantity: Joi.number()
         .integer()
         .min(1)
@@ -57,6 +64,7 @@ export const updateProductSchema = Joi.object({
             "number.integer": "A quantidade deve ser um inteiro.",
             "number.min": "A quantidade mínima é 1."
         }),
+        
     categoria: Joi.string()
         .valid("ELETRONICO", "VESTUARIO", "MOVEIS", "LIVROS", "ALIMENTOS", "BELEZA")
         .messages({

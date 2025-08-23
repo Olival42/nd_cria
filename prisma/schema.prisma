@@ -29,6 +29,7 @@ model Client {
   cpf String @unique
   email String @unique
   phone String
+  orders Order[]
 }
 
 model Product {
@@ -38,4 +39,23 @@ model Product {
   price Float
   quantity Int
   categoria Categoria
+  orderProducts OrderProduct[]
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  clientId Int
+  client Client @relation(fields: [clientId], references: [id])
+  total Float
+  pedidos OrderProduct[]
+}
+
+model OrderProduct {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  subTotal  Float
 }

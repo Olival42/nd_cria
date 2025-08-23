@@ -4,9 +4,9 @@ export const swaggerSpec = swaggerJSDoc({
     definition: {
         openapi: "3.0.0",
         info: {
-            title: "API de Produtos",
+            title: "API ND Cria",
             version: "1.0.0",
-            description: "Documentação da API de produtos",
+            description: "Documentação da ND Cria",
         },
         servers: [
             { url: "http://localhost:3000" }

@@ -1,6 +1,7 @@
 import express from "express";
 import clientRoutes from "./routes/clientRoutes";
 import productRoutes from "./routes/productRoutes";
+import orderRoutes from "./routes/orderRoutes";
 import { errorHandler } from "./middlewares/errorHandler";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/clients", clientRoutes);
 app.use("/products", productRoutes);
+app.use("/orders", orderRoutes);
 
 app.use(errorHandler);
 

@@ -44,6 +44,7 @@ export const createClientSchema = Joi.object({
             "string.empty": "Nome é obrigatório.",
             "string.pattern.base": "Nome deve conter apenas letras."
         }),
+
     email: Joi.string()
         .email()
         .required()
@@ -51,11 +52,13 @@ export const createClientSchema = Joi.object({
             "string.empty": "E-mail é obrigatório.",
             "string.email": "E-mail inválido."
         }),
+
     cpf: cpfSchema
         .required()
         .messages({
             "string.empty": "CPF é obrigatório."
         }),
+
     phone: Joi.string()
         .pattern(/^\d{2}\d{4,5}\d{4}$/)
         .required()
@@ -71,11 +74,13 @@ export const updateClientSchema = Joi.object({
         .messages({
             "string.pattern.base": "Nome deve conter apenas letras."
         }),
+
     email: Joi.string()
         .email()
         .messages({
             "string.email": "E-mail inválido."
         }),
+        
     cpf: cpfSchema,
     phone: Joi.string()
         .pattern(/^\d{2}\d{4,5}\d{4}$/)
