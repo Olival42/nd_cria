@@ -33,10 +33,6 @@ export async function getOrderById(req: Request, res: Response, next: NextFuncti
     try {
         const order = await orderService.getOrderById(id);
 
-        if (!order) {
-            throw new NotFoundError("Pedido não encontrado.");
-        }
-
         return res.status(200).json(order);
     } catch (error) {
         next(error);
@@ -48,11 +44,7 @@ export async function deleteById(req: Request, res: Response, next: NextFunction
     const id = parseInt(req.params.id);
 
     try {
-        const order = await orderService.deleteById(id);
-
-        if (!order) {
-            throw new NotFoundError("Pedido não encontrado.");
-        }
+        await orderService.deleteById(id);
 
         return res.status(200).json({ message: "Pedido excluído com sucesso." });
     } catch (error) {
@@ -71,10 +63,6 @@ export async function updateById(req: Request, res: Response, next: NextFunction
 
     try {
         const order = await orderService.updateById(id, products);
-
-        if (!order) {
-            throw new NotFoundError("Pedido não encontrado.");
-        }
 
         return res.status(200).json(order);
     } catch (error) {

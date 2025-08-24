@@ -1,3 +1,5 @@
+import { EntityInUseError } from "../errors/EntityInUseError";
+import { NotFoundError } from "../errors/NotFoundError";
 import { PrismaClient } from "../generated/prisma";
 
 const prisma = new PrismaClient();
@@ -13,22 +15,44 @@ async function getProducts() {
 }
 
 async function getById(id: number) {
-    return await prisma.product.findUnique({
+    const product = await prisma.product.findUnique({ where: { id } });
+
+    if (!product) {
+        throw new NotFoundError("Produto não encontrado.");
+    }
+
+    return product;
+}
+
+async function deleteById(id: number) {
+
+    const product = await prisma.product.findUnique({ where: { id }, include: { orderProducts: true } });
+
+    if (!product) {
+        throw new NotFoundError("Produto não encontrado.");
+    }
+
+    if (product.orderProducts.length > 0) {
+        throw new EntityInUseError("Produto não pode ser deletado pois está associado a um ou mais registros.")
+    }
+
+    return await prisma.product.delete({
         where: { id },
     });
 }
 
-async function deleteById(id: number) {
-    return await prisma.product.delete({
-        where: { id },
-    }).catch(() => null);
-}
-
 async function update(id: number, productDto: Partial<any>) {
+
+    const product = await prisma.product.findUnique({ where: { id } });
+
+    if (!product) {
+        throw new NotFoundError("Produto não encontrado.");
+    }
+
     return await prisma.product.update({
         where: { id },
         data: productDto,
-    }).catch(() => null);
+    });
 }
 
 export { createProduct, getProducts, getById, deleteById, update };

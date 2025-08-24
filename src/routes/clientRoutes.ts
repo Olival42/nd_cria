@@ -150,6 +150,8 @@ router.get("/:id", clientController.getById);
  *                 message:
  *                   type: string
  *                   example: Cliente excluído com sucesso
+ *       400:
+ *         description: Cliente está associado a um ou mais registros
  *       404:
  *         description: Cliente não encontrado
  *       500:

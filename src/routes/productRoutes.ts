@@ -146,6 +146,9 @@ router.get("/:id", productController.getById);
  *                 message:
  *                   type: string
  *                   example: Produto excluído com sucesso
+ * 
+ *       400:
+ *         description: Cliente está associado a um ou mais registros
  *       404:
  *         description: Produto não encontrado
  *       500:

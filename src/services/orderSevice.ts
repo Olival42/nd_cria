@@ -1,5 +1,6 @@
 import { PrismaClient } from "../generated/prisma";
 import { NotFoundError } from "../errors/NotFoundError";
+import { ProductOutOfStock } from "../errors/ProductOutOfStock";
 
 export interface OrderProductInput {
     productId: number;
@@ -22,11 +23,6 @@ async function createOrder(clientId: number, products: OrderProductInput[]) {
                     create: orderProducts,
                 },
             },
-            include: {
-                pedidos: {
-                    include: { product: true }
-                }
-            }
         });
 
         for (const p of orderProducts) {
@@ -38,7 +34,14 @@ async function createOrder(clientId: number, products: OrderProductInput[]) {
             });
         }
 
-        return order;
+        return prisma.order.findUnique({
+            where: { id: order.id },
+            include: {
+                pedidos: {
+                    include: { product: true },
+                },
+            },
+        });
     });
 
     return result;
@@ -63,29 +66,49 @@ async function getOrders(clientId: number) {
 }
 
 async function getOrderById(id: number) {
-    return await prisma.order.findUnique({
+
+    const order = await prisma.order.findUnique({
         where: { id },
         include: {
             pedidos: {
                 include: { product: true }
             }
         },
-    }).catch(() => null);
+    });
+
+    if (!order) {
+        throw new NotFoundError("Pedido não encontrado.");
+    }
+
+    return order;
 }
 
 async function deleteById(id: number) {
 
     try {
-        await prisma.orderProduct.deleteMany({
-            where: { orderId: id },
-        });
+        return await prisma.$transaction(async (prisma) => {
+            const orderProducts = await prisma.orderProduct.findMany({ where: { orderId: id } });
 
-        return await prisma.order.delete({
-            where: { id },
+            await prisma.orderProduct.deleteMany({
+                where: { orderId: id },
+            });
+
+            await prisma.order.delete({
+                where: { id },
+            });
+
+            for (const p of orderProducts) {
+                await prisma.product.update({
+                    where: { id: p.productId },
+                    data: {
+                        quantity: { increment: p.quantity },
+                    },
+                });
+            }
         });
     } catch (error: any) {
         if (error.code === "P2025") {
-            return null;
+            throw new NotFoundError("Pedido não encontrado.");
         }
         throw error;
     }
@@ -130,7 +153,7 @@ async function updateById(id: number, products: OrderProductInput[]) {
     }
     catch (error: any) {
         if (error.code === "P2025") {
-            return null;
+            throw new NotFoundError("Pedido não encontrado.");
         }
         throw error;
     }
@@ -150,6 +173,10 @@ async function createOrderProducts(products: OrderProductInput[]) {
         const product = dbProducts.find((db) => db.id === p.productId)
         if (!product) {
             throw new NotFoundError("Produto não encontrado.");
+        }
+
+        if (product.quantity === 0) {
+            throw new ProductOutOfStock(product.name);
         }
 
         return {
